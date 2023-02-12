@@ -1,12 +1,12 @@
 use nannou::{App, prelude::Update};
-use ui::update_ui;
-use crate::{model::Model, ui};
+// use ui::update_ui;
+use crate::model::Model;
 
 
 
 pub fn update(app: &App, model: &mut Model, _update: Update) {
     update_model(app, model);
-    update_ui(model);
+    // update_ui(model);
     if model.flock.is_empty() {
         return;
     };

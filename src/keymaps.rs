@@ -30,10 +30,19 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
             model.separation_modifier += 0.05;
         }
         Key::Up => {
-            model.n_boids += 1;
+            if model.n_boids < 5 {
+                model.n_boids += 1
+            } else {
+                model.n_boids += 5
+            };
         }
         Key::Down => {
-            model.n_boids -= 1;
+            if model.n_boids <= 5 && model.n_boids > 1 {
+                model.n_boids -= 1
+            }
+            if model.n_boids > 6 {
+                model.n_boids -= 5;
+            }
         }
         Key::Left => {
             // TODO: Add predators
@@ -42,6 +51,9 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
         Key::Right => {
             // TODO: Add predators
             // model.n_predators -= 1;
+        }
+        Key::H => {
+            model.show_text = !model.show_text;
         }
         Key::Q => {
             exit(1);

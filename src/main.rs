@@ -1,22 +1,25 @@
+use model::model;
 use model::Model;
 use nannou::prelude::*;
 mod boids;
-mod keymaps;
 mod flock;
+mod keymaps;
 mod model;
-pub mod ui;
+mod ui;
 mod update;
 use flock::Flock;
+use ui::draw_text;
 use update::update;
 
 fn main() {
-    nannou::app(model::model).update(update).run();
+    nannou::app(model).update(update).run();
 }
 
 fn view(app: &App, model: &Model, frame: Frame) {
     let draw = app.draw();
 
     draw.background().color(SKYBLUE);
+    draw_text(app, model, &draw);
 
     for boid in &model.flock {
         boid.show(&draw);

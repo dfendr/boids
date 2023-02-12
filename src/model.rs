@@ -1,16 +1,17 @@
 use crate::{
-    keymaps::key_pressed,
     boids::Boid,
-    ui::{raw_ui_event, ui_view},
-    view, Flock,
+    keymaps::key_pressed,
+    // ui::{raw_ui_event, ui_view},
+    view,
+    Flock,
 };
 
 use nannou::prelude::*;
-use nannou_egui::Egui;
 
 pub struct Model {
     pub main_window: WindowId,
-    pub ui: Egui,
+    // pub ui: Egui,
+    pub show_text: bool,
     pub flock: Vec<Boid>,
     pub n_boids: i32,
     pub boid_height: f32,
@@ -32,10 +33,10 @@ impl Model {
         let boid = Boid::new(random_range(left, right), random_range(bottom, top));
         self.flock.push(boid);
     }
-    pub fn add_boid_center(&mut self) {
-        let boid = Boid::new(0.0, 0.0);
-        self.flock.push(boid);
-    }
+    // pub fn add_boid_center(&mut self) {
+    //     let boid = Boid::new(0.0, 0.0);
+    //     self.flock.push(boid);
+    // }
 }
 
 pub fn model(app: &App) -> Model {
@@ -43,9 +44,11 @@ pub fn model(app: &App) -> Model {
         .new_window()
         .title(app.exe_name().unwrap_or_default())
         .view(view)
+        .key_pressed(key_pressed)
         .build()
         .expect("ah geez something happened...i'm sorry.");
 
+    let show_text = true;
     // defaults
     let n_boids = 100;
     let alignment_modifier = 1.0;
@@ -62,25 +65,25 @@ pub fn model(app: &App) -> Model {
 
     let flock = Flock::new_flock(app.window_rect(), n_boids as u32);
 
-    let ui_window = app
-        .new_window()
-        .title(
-            app.exe_name()
-                .expect("contact the police if this throws an error.")
-                + " controls",
-        )
-        .size(280, 170)
-        .view(ui_view)
-        .raw_event(raw_ui_event)
-        .key_pressed(key_pressed)
-        .build()
-        .expect("error drawing ui controls window");
-
-    let ui = Egui::from_window(&app.window(ui_window).expect("window id invalid -- error"));
+    // let ui_window = app
+    //     .new_window()
+    //     .title(
+    //         app.exe_name()
+    //             .expect("contact the police if this throws an error.")
+    //             + " controls",
+    //     )
+    //     .size(280, 170)
+    //     .view(ui_view)
+    //     .raw_event(raw_ui_event)
+    //     .build()
+    //     .expect("error drawing ui controls window");
+    //
+    // let ui = Egui::from_window(&app.window(ui_window).expect("window id invalid -- error"));
 
     Model {
         main_window,
-        ui,
+        // ui,
+        show_text,
         flock,
         n_boids,
         alignment_modifier,
