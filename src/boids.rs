@@ -1,5 +1,6 @@
 use nannou::prelude::*;
 
+
 #[derive(PartialEq)]
 pub struct Boid {
     pub width: f32,
