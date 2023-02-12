@@ -1,6 +1,8 @@
+use std::ops::Add;
+
 use nannou::prelude::*;
 
-const N_BOIDS: u32 = 300;
+const N_BOIDS: u32 = 100;
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -30,7 +32,6 @@ impl Flock {
 struct Boid {
     width: f32,
     height: f32,
-    size: f32,
     position: Vec2,
     velocity: Vec2,
     acceleration: Vec2,
@@ -45,19 +46,17 @@ impl Boid {
     fn new(x: f32, y: f32) -> Boid {
         let width = 10.0;
         let height = 15.0;
-        let size = (width * height) / 2.0;
         let position = vec2(x, y);
         let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0));
         let acceleration = vec2(0.0, 0.0);
-        let max_force = 0.1;
+        let max_force = 0.2;
         let max_speed = 5.0;
-        let min_speed = 3.0;
-        let visual_range = 80.0;
-        let protected_range = 20.0;
+        let min_speed = 2.0;
+        let visual_range = 100.0;
+        let protected_range = 30.0;
         Boid {
             width,
             height,
-            size,
             position,
             velocity,
             acceleration,
@@ -88,55 +87,39 @@ impl Boid {
     }
 
     fn separate(&self, nearby_boids: &[&Boid]) -> Vec2 {
-        let mut steering = Vec2::ZERO;
+        let mut separation_force = Vec2::ZERO;
         if nearby_boids.is_empty() {
-            return steering;
+            return separation_force;
         }
-        let mut too_close_count = 0;
 
         // Get Average Velocity
-        for other in nearby_boids {
-            if self.position.distance(other.position) < self.protected_range {
-                steering = steering + self.position - other.position;
-                too_close_count += 1;
-            }
-        }
-        if too_close_count == 0 {
-            return Vec2::ZERO;
-        }
-        steering /= too_close_count as f32;
+        for boid in nearby_boids {
+            let distance_vec = self.position - boid.position;
+            let length = distance_vec.length();
+            let weight = (self.protected_range - length) / self.protected_range;
 
-        // Scale accordingly
-        steering *= self.max_force;
-        steering = steering.clamp_length_max(self.max_force * 2.0);
+            separation_force += distance_vec.clamp_length_max(1.0) * weight;
+        }
+        println!("{separation_force}");
 
-        steering
+        separation_force
     }
 
     fn cohere(&self, nearby_boids: &[&Boid]) -> Vec2 {
-        let mut steering = Vec2::ZERO;
+        let mut cohesion_force = Vec2::ZERO;
+        let mut average_position = Vec2::ZERO;
         if nearby_boids.is_empty() {
-            return steering;
+            return cohesion_force;
         }
-        let mut neighbour_count = 0;
 
         // Get Average Velocity
         for other in nearby_boids {
-            if self.position.distance(other.position) > self.protected_range {
-                steering = steering + other.position;
-                neighbour_count += 1;
-            }
+            average_position += other.position;
         }
-        if neighbour_count == 0 {
-            return Vec2::ZERO;
-        }
-        steering /= neighbour_count as f32;
-        steering -= self.position;
-        steering = steering.clamp_length_max(self.max_speed);
-        steering -= self.velocity;
-        steering = limit_2d(steering, self.max_force);
 
-        steering
+        average_position /= nearby_boids.len() as f32;
+        cohesion_force = (average_position - self.position).normalize();
+        cohesion_force
     }
 
     fn apply_force(&mut self, force: Vec2) {
@@ -145,7 +128,6 @@ impl Boid {
     }
 
     fn wrap(&mut self, win: &Rect) {
-        let size = self.size;
         let left = win.left();
         let right = win.right();
         let top = win.top();
@@ -179,27 +161,24 @@ impl Boid {
         };
         if let Some(desired) = desired {
             let desired = desired.normalize() * self.max_speed;
-            let steer = (desired - self.velocity).clamp_length_max(self.max_force * 3.0);
+            let steer = (desired - self.velocity).clamp_length_max(self.max_force * 1.5);
             self.apply_force(steer);
         }
     }
 
-    fn nearby_boids<'a>(&self, flock: &'a Vec<Boid>) -> Vec<&'a Boid> {
+    fn nearby_boids<'a>(&self, flock: &'a Vec<Boid>) -> (Vec<&'a Boid>, Vec<&'a Boid>) {
         let mut nearby_boids: Vec<&Boid> = Vec::new();
         let mut close_boids: Vec<&Boid> = Vec::new();
         for other in flock {
-            //(DotProduct(boid.velocity, otherboid.position - boid.position) > 0)
-            let d = Vec2::distance(self.position, other.position).abs();
-            // Check if other in front of self
-            // let dot = self.position.dot(other.position - self.position) > 0.0;
-            if other != self && d < self.visual_range {
+            let d = self.position.distance(other.position).abs();
+            if other != self && d <= self.visual_range && d > self.protected_range {
                 nearby_boids.push(other);
-                if d < self.protected_range{
-                    close_boids.push(other);
-                }
+            }
+            if d < self.protected_range {
+                close_boids.push(other);
             }
         }
-        nearby_boids
+        (nearby_boids, close_boids)
     }
 
     fn update(&mut self) {
@@ -240,9 +219,9 @@ fn model(app: &App) -> Model {
 
 fn update(app: &App, model: &mut Model, _update: Update) {
     for i in 0..model.flock.len() {
-        let nearby_boids = model.flock[i].nearby_boids(&model.flock);
+        let (nearby_boids, close_boids) = model.flock[i].nearby_boids(&model.flock);
         let v1 = model.flock[i].align(&nearby_boids);
-        let v2 = model.flock[i].separate(&nearby_boids);
+        let v2 = model.flock[i].separate(&close_boids);
         let v3 = model.flock[i].cohere(&nearby_boids);
         model.flock[i].acceleration += v1;
         model.flock[i].acceleration += v2;
