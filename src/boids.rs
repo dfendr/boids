@@ -142,7 +142,7 @@ impl Boid {
             if other != self && d <= self.visual_range && d > self.protected_range {
                 nearby_boids.push(other);
             }
-            if d < self.protected_range {
+            if other != self && d < self.protected_range {
                 close_boids.push(other);
             }
         }
