@@ -100,7 +100,6 @@ impl Boid {
 
             separation_force += distance_vec.clamp_length_max(1.0) * weight;
         }
-        println!("{separation_force}");
 
         separation_force
     }
