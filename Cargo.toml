@@ -2,6 +2,7 @@
 name = "boids_rs"
 version = "0.1.0"
 edition = "2021"
+description="Flocking Simulator"
 
 [dependencies]
 nannou = "0.18.1"
@@ -11,3 +12,9 @@ strip = true  # Automatically strip symbols from the binary.
 opt-level = "z"  # Optimize for size.
 lto = true
 codegen-units = 1
+
+[package.metadata.bundle]
+name = "boids_rs"
+identifier = "io.github.postfen.boids"
+osx_minimum_system_version="12.4"
+short_description="Flocking Simulator"
