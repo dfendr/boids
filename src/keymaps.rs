@@ -33,6 +33,9 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
             model.separation_modifier += 0.05;
         }
         Key::Up => {
+            if model.n_boids == 1000 {
+                return;
+            }
             if model.n_boids < 5 {
                 model.n_boids += 1
             } else {

@@ -12,11 +12,8 @@ use flock::Flock;
 use ui::draw_information_text;
 use update::update;
 
-
 fn main() {
-    nannou::app(model)
-        .update(update)
-        .run();
+    nannou::app(model).update(update).run();
 }
 
 fn view(app: &App, model: &Model, frame: Frame) {
@@ -27,11 +24,16 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     draw.background().color(SKYBLUE);
     draw_information_text(app, model, &draw);
+    for predator in &model.predators{
+        predator.show(&draw);
+    }
     for boid in &model.flock {
         boid.show(&draw);
     }
     draw.ellipse()
         .xy(app.mouse.position())
+        .stroke_color(BLACK)
+        .color(BLACK)
         .height(5.0)
         .width(5.0);
 

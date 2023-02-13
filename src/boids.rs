@@ -2,8 +2,45 @@ use nannou::prelude::*;
 
 use crate::cursor::CursorMode;
 
+#[derive(PartialEq, Clone, Copy)]
+pub enum BoidType {
+    Prey,
+    Predator,
+}
+
+impl BoidType {
+    fn color(&self) -> Rgb8 {
+        match self {
+            BoidType::Prey => BLACK,
+            BoidType::Predator => RED,
+        }
+    }
+
+    fn visual_range(&self) -> f32 {
+        match self {
+            BoidType::Prey => 80.0,
+            BoidType::Predator => 100.0,
+        }
+    }
+
+    fn max_speed(&self) -> f32 {
+        match self {
+            BoidType::Prey => 4.0,
+            BoidType::Predator => 3.0,
+        }
+    }
+    fn size(&self) -> (f32, f32) {
+        match self {
+            BoidType::Prey => (10.0, 15.0),
+            BoidType::Predator => (15.0, 20.0),
+        }
+    }
+}
+
 #[derive(PartialEq)]
 pub struct Boid {
+    pub boid_type: BoidType,
+    pub color: Rgb8,
     pub width: f32,
     pub height: f32,
     pub position: Vec2,
@@ -17,18 +54,20 @@ pub struct Boid {
 }
 
 impl Boid {
-    pub fn new(x: f32, y: f32) -> Boid {
-        let width = 10.0;
-        let height = 15.0;
+    pub fn new(x: f32, y: f32, boid_type: BoidType) -> Boid {
+        let color = boid_type.color();
+        let (width, height) = boid_type.size();
         let position = vec2(x, y);
         let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0));
         let acceleration = vec2(0.0, 0.0);
         let max_force = 0.2;
-        let max_speed = 4.0;
+        let max_speed = boid_type.max_speed();
         let min_speed = 2.0;
-        let visual_range = 100.0;
+        let visual_range = boid_type.visual_range();
         let protected_range = 30.0;
         Boid {
+            boid_type,
+            color,
             width,
             height,
             position,
@@ -54,7 +93,7 @@ impl Boid {
         }
         average_alignment /= nearby_boids.len() as f32;
 
-        average_alignment.clamp_length_max(1.0)
+        average_alignment.normalize_or_zero()
     }
 
     pub fn separate(&self, nearby_boids: &[&Boid]) -> Vec2 {
@@ -69,7 +108,7 @@ impl Boid {
             let length = distance_vec.length();
             let weight = (self.protected_range - length) / self.protected_range;
 
-            separation_force += distance_vec.clamp_length_max(1.0) * weight;
+            separation_force += distance_vec.normalize_or_zero() * weight;
         }
 
         separation_force
@@ -148,7 +187,30 @@ impl Boid {
         (nearby_boids, close_boids)
     }
 
-    pub fn cursor_interaction(&mut self, app: &App, cursor_mode: &CursorMode) -> Vec2 {
+    pub fn avoid_predators(&self, predators: &[Boid]) -> Vec2 {
+        if predators.is_empty() {
+            return Vec2::ZERO;
+        }
+
+        let mut average_position = Vec2::ZERO;
+
+        // Get Average Velocity
+        for predator in predators {
+            if predator.position.distance(self.position) < self.visual_range {
+                average_position += predator.position;
+            }
+        }
+        if average_position == Vec2::ZERO {
+            return average_position;
+        }
+
+        average_position /= predators.len() as f32;
+        // avoidance_force = (average_position + self.position).normalize();
+
+        ((average_position - self.position) * -1.0).clamp_length_max(0.7) // set the desired speed
+    }
+
+    pub fn cursor_interaction(&self, app: &App, cursor_mode: &CursorMode) -> Vec2 {
         let cursor_pos = app.mouse.position();
         let (direction, range_modifier) = match cursor_mode {
             CursorMode::Attract => (1.0, 2.0),
@@ -159,7 +221,7 @@ impl Boid {
             return Vec2::ZERO;
         }
 
-        ((cursor_pos - self.position) * direction).clamp_length_max(1.5) // set the desired speed
+        ((cursor_pos - self.position) * direction).normalize_or_zero() // set the desired speed
     }
 
     pub fn update(&mut self) {
@@ -168,7 +230,7 @@ impl Boid {
         self.velocity = self.velocity.clamp_length(self.min_speed, self.max_speed);
 
         //TODO: Implement deltatime when reliable refresh rate can be used.
-        // self.velocity *= delta_time;
+        // self.velocity *= delta_time * 120.0;
         self.position += self.velocity;
         // Reset acceleration to 0 each cycle.
         self.acceleration *= 0.0;
@@ -178,6 +240,6 @@ impl Boid {
             .w_h(self.height, self.width)
             .xy(self.position)
             .rotate(self.velocity.angle())
-            .color(BLACK);
+            .color(self.color);
     }
 }

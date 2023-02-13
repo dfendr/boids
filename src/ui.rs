@@ -7,8 +7,8 @@ pub fn draw_information_text(app: &App, model: &Model, draw: &Draw) {
     draw_instructions(app, model, draw);
 }
 
-pub fn draw_settings(_app: &App, model: &Model, draw: &Draw) {
-    let position = _app
+pub fn draw_settings(app: &App, model: &Model, draw: &Draw) {
+    let position = app
         .window_rect()
         .pad_bottom(50.0)
         .pad_left(100.0)
@@ -16,13 +16,15 @@ pub fn draw_settings(_app: &App, model: &Model, draw: &Draw) {
     if model.show_text {
         draw.text(
             format!(
-                "Boids: {}\nAlignment: {:.1}%\nCohesion: {:.1}%\nSeparation: {:.1}%\nCursor Mode: {:#?}",
+                "Boids: {}\nAlignment: {:.1}%\nCohesion: {:.1}%\nSeparation: {:.1}%\nCursor Mode: {:#?}\nFPS {:.0}",
                 model.n_boids,
                 // Added 0.001 so -0.0 wouldn't show up when rounding
                 (model.alignment_modifier + 0.0001) * 100.0,
                 (model.cohesion_modifier + 0.0001) * 100.0,
                 (model.separation_modifier + 0.0001) * 100.0,
-                model.cursor_mode
+                model.cursor_mode,
+                app.fps()
+
             )
             .trim(),
         )
