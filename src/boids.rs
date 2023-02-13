@@ -12,7 +12,7 @@ impl BoidType {
     fn color(&self) -> Rgb8 {
         match self {
             BoidType::Prey => BLACK,
-            BoidType::Predator => RED,
+            BoidType::Predator => DARKRED,
         }
     }
 
@@ -31,8 +31,8 @@ impl BoidType {
     }
     fn size(&self) -> (f32, f32) {
         match self {
-            BoidType::Prey => (10.0, 15.0),
-            BoidType::Predator => (15.0, 20.0),
+            BoidType::Prey => (10.0, 12.0),
+            BoidType::Predator => (15.0, 17.0),
         }
     }
 }
@@ -80,55 +80,30 @@ impl Boid {
             protected_range,
         }
     }
-
     pub fn align(&self, nearby_boids: &[&Boid]) -> Vec2 {
-        let mut average_alignment = Vec2::ZERO;
-        if nearby_boids.is_empty() {
-            return average_alignment;
-        }
-
-        // Get Average Velocity
-        for other in nearby_boids {
-            average_alignment += other.velocity;
-        }
-        average_alignment /= nearby_boids.len() as f32;
-
-        average_alignment.normalize_or_zero()
+        nearby_boids
+            .iter()
+            .fold(Vec2::ZERO, |sum, &boid| sum + boid.velocity)
+            .normalize_or_zero()
     }
-
     pub fn separate(&self, nearby_boids: &[&Boid]) -> Vec2 {
-        let mut separation_force = Vec2::ZERO;
-        if nearby_boids.is_empty() {
-            return separation_force;
-        }
-
-        // Get Average Velocity
-        for boid in nearby_boids {
+        nearby_boids.iter().fold(Vec2::ZERO, |sum, &boid| {
             let distance_vec = self.position - boid.position;
             let length = distance_vec.length();
             let weight = (self.protected_range - length) / self.protected_range;
 
-            separation_force += distance_vec.normalize_or_zero() * weight;
-        }
-
-        separation_force
+            sum + distance_vec.normalize_or_zero() * weight
+        })
     }
-
     pub fn cohere(&self, nearby_boids: &[&Boid]) -> Vec2 {
-        let mut cohesion_force = Vec2::ZERO;
-        let mut average_position = Vec2::ZERO;
-        if nearby_boids.is_empty() {
-            return cohesion_force;
-        }
+        let average_position = nearby_boids
+            .iter()
+            .fold(Vec2::ZERO, |sum, &boid| sum + boid.position);
 
-        // Get Average Velocity
-        for other in nearby_boids {
-            average_position += other.position;
+        match average_position != Vec2::ZERO {
+            true => (average_position / nearby_boids.len() as f32 - self.position).normalize(),
+            false => average_position,
         }
-
-        average_position /= nearby_boids.len() as f32;
-        cohesion_force = (average_position - self.position).normalize();
-        cohesion_force
     }
 
     pub fn wrap(&mut self, win: &Rect) {
@@ -187,27 +162,16 @@ impl Boid {
         (nearby_boids, close_boids)
     }
 
-    pub fn avoid_predators(&self, predators: &[Boid]) -> Vec2 {
-        if predators.is_empty() {
-            return Vec2::ZERO;
+    pub fn avoid_predators1(&self, predators: &[Boid]) -> Vec2 {
+        let average_position = predators
+            .iter()
+            .filter(|predator| predator.position.distance(self.position) < self.visual_range)
+            .fold(Vec2::ZERO, |sum, predator| sum + predator.position);
+
+        match average_position == Vec2::ZERO {
+            true => average_position,
+            false => ((average_position - self.position) * -1.0).clamp_length_max(0.7),
         }
-
-        let mut average_position = Vec2::ZERO;
-
-        // Get Average Velocity
-        for predator in predators {
-            if predator.position.distance(self.position) < self.visual_range {
-                average_position += predator.position;
-            }
-        }
-        if average_position == Vec2::ZERO {
-            return average_position;
-        }
-
-        average_position /= predators.len() as f32;
-        // avoidance_force = (average_position + self.position).normalize();
-
-        ((average_position - self.position) * -1.0).clamp_length_max(0.7) // set the desired speed
     }
 
     pub fn cursor_interaction(&self, app: &App, cursor_mode: &CursorMode) -> Vec2 {

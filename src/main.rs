@@ -22,7 +22,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
         .expect("Error retrieving main window")
         .set_cursor_visible(false);
 
-    draw.background().color(SKYBLUE);
+    draw.background().color(GREY);
     draw_information_text(app, model, &draw);
     for predator in &model.predators{
         predator.show(&draw);
