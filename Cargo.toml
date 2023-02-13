@@ -15,7 +15,7 @@ lto = true
 codegen-units = 1
 
 [package.metadata.bundle]
-name = "boids_rs"
+name = "boids"
 identifier = "io.github.postfen.boids"
 osx_minimum_system_version="12.4"
 short_description="Flocking Simulator"
