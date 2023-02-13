@@ -1,17 +1,14 @@
-use crate::{
-    boids::Boid,
-    keymaps::key_pressed,
-    view,
-    Flock,
-};
+use crate::{boids::Boid, cursor::CursorMode, keymaps::key_pressed, view, Flock};
 
 use nannou::prelude::*;
 
 pub struct Model {
     pub main_window: WindowId,
     // pub ui: Egui,
+    pub cursor_mode: CursorMode,
     pub show_text: bool,
     pub flock: Vec<Boid>,
+    pub ticks: u64,
     pub n_boids: i32,
     pub boid_height: f32,
     pub boid_width: f32,
@@ -49,6 +46,8 @@ pub fn model(app: &App) -> Model {
 
     let show_text = true;
     // defaults
+    let cursor_mode = CursorMode::Ignore;
+    let ticks: u64 = 0;
     let n_boids = 100;
     let alignment_modifier = 1.0;
     let cohesion_modifier = 1.0;
@@ -82,7 +81,9 @@ pub fn model(app: &App) -> Model {
     Model {
         main_window,
         // ui,
+        cursor_mode,
         show_text,
+        ticks,
         flock,
         n_boids,
         alignment_modifier,

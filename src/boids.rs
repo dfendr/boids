@@ -1,5 +1,7 @@
 use nannou::prelude::*;
 
+use crate::cursor::CursorMode;
+
 #[derive(PartialEq)]
 pub struct Boid {
     pub width: f32,
@@ -90,11 +92,6 @@ impl Boid {
         cohesion_force
     }
 
-    fn apply_force(&mut self, force: Vec2) {
-        // We could add mass here if we want A = F / M
-        self.acceleration += force;
-    }
-
     pub fn wrap(&mut self, win: &Rect) {
         let left = win.left();
         let right = win.right();
@@ -113,7 +110,7 @@ impl Boid {
         };
     }
 
-    pub fn avoid_bounds(&mut self, win: &Rect) {
+    pub fn avoid_bounds(&mut self, win: &Rect) -> Vec2 {
         let margin = 50.0;
         let left = win.left() + self.visual_range + margin;
         let right = win.right() - self.visual_range - margin;
@@ -130,8 +127,9 @@ impl Boid {
         if let Some(desired) = desired {
             let desired = desired.normalize() * self.max_speed;
             let steer = (desired - self.velocity).clamp_length_max(self.max_force * 1.5);
-            self.apply_force(steer);
+            return steer;
         }
+        Vec2::ZERO
     }
 
     pub fn get_neighbours<'a>(&self, flock: &'a Vec<Boid>) -> (Vec<&'a Boid>, Vec<&'a Boid>) {
@@ -149,11 +147,27 @@ impl Boid {
         (nearby_boids, close_boids)
     }
 
+    pub fn cursor_interaction(&mut self, app: &App, cursor_mode: &CursorMode) -> Vec2 {
+        let cursor_pos = app.mouse.position();
+        let direction = match cursor_mode {
+            CursorMode::Attract => 1.0,
+            CursorMode::Avoid => -1.0,
+            CursorMode::Ignore => 0.0,
+        };
+        if self.position.distance(cursor_pos) > self.visual_range * 2.0 {
+            return Vec2::ZERO;
+        }
+
+        ((cursor_pos - self.position) * direction).clamp_length_max(1.5) // set the desired speed
+    }
+
     pub fn update(&mut self, delta_time: f32) {
         self.velocity += self.acceleration;
         // Limit speed between bounds
         self.velocity = self.velocity.clamp_length(self.min_speed, self.max_speed);
-        self.velocity *= delta_time * 120.0;
+
+        //TODO: Implement deltatime when reliable refresh rate can be used.
+        self.velocity *= delta_time;
         self.position += self.velocity;
         // Reset acceleration to 0 each cycle.
         self.acceleration *= 0.0;
