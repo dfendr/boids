@@ -4,31 +4,31 @@ use crate::model::Model;
 
 pub fn update(app: &App, model: &mut Model, _update: Update) {
     update_model(app, model);
-    // update_ui(model);
     if model.flock.is_empty() {
         return;
     };
-    let delta_time = app.duration.since_prev_update;
-    println!("Delta time: {:?}", delta_time.as_secs_f32());
-
+    let delta_time = app.duration.since_prev_update.as_secs_f32();
     for i in 0..model.flock.len() {
         let (nearby_boids, close_boids) = model.flock[i].get_neighbours(&model.flock);
         let alignment = model.flock[i].align(&nearby_boids) * model.alignment_modifier;
         let seperation = model.flock[i].separate(&close_boids) * model.separation_modifier;
         let cohesion = model.flock[i].cohere(&nearby_boids) * model.cohesion_modifier;
-        model.flock[i].acceleration += alignment + seperation + cohesion;
-
-        model.flock[i].avoid_bounds(
+        let cursor_interaction = model.flock[i].cursor_interaction(app, &model.cursor_mode);
+        let bounds_force = model.flock[i].avoid_bounds(
             &app.window(model.main_window)
                 .expect("Problem retrieving main window")
                 .rect(),
         );
+        model.flock[i].acceleration +=
+            alignment + seperation + cohesion + bounds_force + cursor_interaction;
+
         model.flock[i].wrap(
             &app.window(model.main_window)
                 .expect("Problem retrieving main window")
                 .rect(),
         );
-        model.flock[i].update(delta_time.as_secs_f32());
+        model.flock[i].update(delta_time);
+        model.ticks += 1;
     }
 }
 
