@@ -7,7 +7,6 @@ pub fn update(app: &App, model: &mut Model, _update: Update) {
     if model.flock.is_empty() {
         return;
     };
-    let delta_time = app.duration.since_prev_update.as_secs_f32();
     for i in 0..model.flock.len() {
         let (nearby_boids, close_boids) = model.flock[i].get_neighbours(&model.flock);
         let alignment = model.flock[i].align(&nearby_boids) * model.alignment_modifier;
@@ -27,7 +26,7 @@ pub fn update(app: &App, model: &mut Model, _update: Update) {
                 .expect("Problem retrieving main window")
                 .rect(),
         );
-        model.flock[i].update(delta_time);
+        model.flock[i].update();
         model.ticks += 1;
     }
 }

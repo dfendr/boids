@@ -161,13 +161,13 @@ impl Boid {
         ((cursor_pos - self.position) * direction).clamp_length_max(1.5) // set the desired speed
     }
 
-    pub fn update(&mut self, delta_time: f32) {
+    pub fn update(&mut self) {
         self.velocity += self.acceleration;
         // Limit speed between bounds
         self.velocity = self.velocity.clamp_length(self.min_speed, self.max_speed);
 
         //TODO: Implement deltatime when reliable refresh rate can be used.
-        self.velocity *= delta_time;
+        // self.velocity *= delta_time;
         self.position += self.velocity;
         // Reset acceleration to 0 each cycle.
         self.acceleration *= 0.0;
