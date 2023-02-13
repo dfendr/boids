@@ -1,6 +1,5 @@
 use nannou::prelude::*;
 
-
 #[derive(PartialEq)]
 pub struct Boid {
     pub width: f32,
@@ -150,10 +149,11 @@ impl Boid {
         (nearby_boids, close_boids)
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, delta_time: f32) {
         self.velocity += self.acceleration;
         // Limit speed between bounds
         self.velocity = self.velocity.clamp_length(self.min_speed, self.max_speed);
+        self.velocity *= delta_time * 120.0;
         self.position += self.velocity;
         // Reset acceleration to 0 each cycle.
         self.acceleration *= 0.0;

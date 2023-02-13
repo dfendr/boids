@@ -1,7 +1,6 @@
 use crate::{
     boids::Boid,
     keymaps::key_pressed,
-    // ui::{raw_ui_event, ui_view},
     view,
     Flock,
 };

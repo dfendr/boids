@@ -24,7 +24,6 @@ fn view(app: &App, model: &Model, frame: Frame) {
     for boid in &model.flock {
         boid.show(&draw);
     }
-
     draw.to_frame(app, &frame)
         .expect("WHOA NELLY THIS AINT GOOD");
 }
