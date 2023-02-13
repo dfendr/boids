@@ -93,10 +93,11 @@ impl Boid {
     }
 
     pub fn wrap(&mut self, win: &Rect) {
-        let left = win.left();
-        let right = win.right();
-        let top = win.top();
-        let bottom = win.bottom();
+        let pad = 10.0;
+        let left = win.left() - pad;
+        let right = win.right() + pad;
+        let top = win.top() + pad;
+        let bottom = win.bottom() - pad;
 
         self.position.x = match self.position.x {
             x if x > right => left,
@@ -149,12 +150,12 @@ impl Boid {
 
     pub fn cursor_interaction(&mut self, app: &App, cursor_mode: &CursorMode) -> Vec2 {
         let cursor_pos = app.mouse.position();
-        let direction = match cursor_mode {
-            CursorMode::Attract => 1.0,
-            CursorMode::Avoid => -1.0,
-            CursorMode::Ignore => 0.0,
+        let (direction, range_modifier) = match cursor_mode {
+            CursorMode::Attract => (1.0, 2.0),
+            CursorMode::Avoid => (-1.0, 1.0),
+            CursorMode::Ignore => (0.0, 0.0),
         };
-        if self.position.distance(cursor_pos) > self.visual_range * 2.0 {
+        if self.position.distance(cursor_pos) > self.visual_range * range_modifier {
             return Vec2::ZERO;
         }
 
