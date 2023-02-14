@@ -162,7 +162,7 @@ impl Boid {
         (nearby_boids, close_boids)
     }
 
-    pub fn avoid_predators1(&self, predators: &[Boid]) -> Vec2 {
+    pub fn avoid_predators(&self, predators: &[Boid]) -> Vec2 {
         let average_position = predators
             .iter()
             .filter(|predator| predator.position.distance(self.position) < self.visual_range)
