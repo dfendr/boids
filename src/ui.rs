@@ -47,4 +47,3 @@ pub fn draw_instructions(_app: &App, model: &Model, draw: &Draw) {
         .xy(position);
     }
 }
-

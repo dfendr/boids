@@ -10,6 +10,7 @@ pub fn update(app: &App, model: &mut Model, _update: Update) {
     for i in 0..model.predators.len() {
         let (mut nearby_boids, close_boids) = model.predators[i].get_neighbours(&model.flock);
         nearby_boids.extend(close_boids);
+        model.predators[i].neighbour_count = nearby_boids.len();
         let hunting_force = model.predators[i].cohere(&nearby_boids);
         let bounds_force = model.predators[i].avoid_bounds(
             &app.window(model.main_window)
@@ -28,6 +29,7 @@ pub fn update(app: &App, model: &mut Model, _update: Update) {
         let cohesion = model.flock[i].cohere(&nearby_boids) * model.cohesion_modifier;
         let predator_avoidance = model.flock[i].avoid_predators(&model.predators);
         let cursor_interaction = model.flock[i].cursor_interaction(app, &model.cursor_mode);
+        model.flock[i].neighbour_count = nearby_boids.len();
         let bounds_force = model.flock[i].avoid_bounds(
             &app.window(model.main_window)
                 .expect("Problem retrieving main window")

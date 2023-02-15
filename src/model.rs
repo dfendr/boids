@@ -5,26 +5,31 @@ use crate::{
     },
     cursor::CursorMode,
     keymaps::key_pressed,
+    theme::Theme,
     view, Flock,
 };
 
 use nannou::prelude::*;
 
+pub struct BoidOptions {
+    pub boid_starting_velocity: f32,
+    pub boid_colour: Rgb8,
+    pub boid_min_speed: f32,
+    pub boid_max_speed: f32,
+}
+
 pub struct Model {
     pub main_window: WindowId,
-    // pub ui: Egui,
+    pub boid_options: BoidOptions,
     pub cursor_mode: CursorMode,
     pub show_text: bool,
+    pub theme: Theme,
     pub flock: Vec<Boid>,
     pub predators: Vec<Boid>,
-    pub ticks: u64,
     pub n_boids: i32,
-    pub boid_starting_velocity: f32,
     pub alignment_modifier: f32,
     pub cohesion_modifier: f32,
     pub separation_modifier: f32,
-    pub boid_min_speed: f32,
-    pub boid_max_speed: f32,
     pub max_force: f32,
 }
 
@@ -57,14 +62,17 @@ pub fn model(app: &App) -> Model {
     let show_text = true;
     // defaults
     let cursor_mode = CursorMode::Ignore;
-    let ticks: u64 = 0;
     let n_boids = 100;
+    let theme = Theme::Normal;
     let alignment_modifier = 0.25;
     let cohesion_modifier = 0.25;
     let separation_modifier = 0.75;
-    let boid_starting_velocity = 1.0;
-    let boid_max_speed = 3.0;
-    let boid_min_speed = 1.0;
+    let boid_options = BoidOptions {
+        boid_starting_velocity: 1.0,
+        boid_colour: BLACK,
+        boid_min_speed: 1.0,
+        boid_max_speed: 3.0,
+    };
     let max_force = 0.2;
 
     let flock = Flock::new_flock(app.window_rect(), n_boids as u32, Prey);
@@ -72,19 +80,16 @@ pub fn model(app: &App) -> Model {
 
     Model {
         main_window,
-        // ui,
+        boid_options,
         cursor_mode,
         show_text,
-        ticks,
+        theme,
         flock,
         predators,
         n_boids,
         alignment_modifier,
         cohesion_modifier,
         separation_modifier,
-        boid_starting_velocity,
-        boid_min_speed,
-        boid_max_speed,
         max_force,
     }
 }

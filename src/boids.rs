@@ -1,6 +1,6 @@
 use nannou::prelude::*;
 
-use crate::cursor::CursorMode;
+use crate::{cursor::CursorMode, model::Model, theme::Theme};
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum BoidType {
@@ -9,7 +9,7 @@ pub enum BoidType {
 }
 
 impl BoidType {
-    fn color(&self) -> Rgb8 {
+    fn default_color(&self) -> Rgb8 {
         match self {
             BoidType::Prey => BLACK,
             BoidType::Predator => DARKRED,
@@ -46,6 +46,7 @@ pub struct Boid {
     pub position: Vec2,
     pub velocity: Vec2,
     pub acceleration: Vec2,
+    pub neighbour_count: usize,
     pub max_force: f32,
     pub max_speed: f32,
     pub min_speed: f32,
@@ -55,11 +56,12 @@ pub struct Boid {
 
 impl Boid {
     pub fn new(x: f32, y: f32, boid_type: BoidType) -> Boid {
-        let color = boid_type.color();
+        let color = boid_type.default_color();
         let (width, height) = boid_type.size();
         let position = vec2(x, y);
         let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0));
         let acceleration = vec2(0.0, 0.0);
+        let neighbour_count = 0;
         let max_force = 0.2;
         let max_speed = boid_type.max_speed();
         let min_speed = 2.0;
@@ -72,6 +74,7 @@ impl Boid {
             height,
             position,
             velocity,
+            neighbour_count,
             acceleration,
             max_force,
             max_speed,
@@ -199,11 +202,19 @@ impl Boid {
         // Reset acceleration to 0 each cycle.
         self.acceleration *= 0.0;
     }
-    pub fn show(&self, draw: &Draw) {
+    pub fn show(&self, draw: &Draw, model: &Model) {
+        // let flock_count = model.flock.len();
+        // let ratio = self.neighbour_count as f32 / flock_count as f32;
+        // let color = get_color(ratio, &model.theme, &self.color);
+        let mut color = self.color;
+        if model.theme == Theme::DeepSea {
+            color = rgb8(200, 200, 200);
+        }
+
         draw.tri()
             .w_h(self.height, self.width)
             .xy(self.position)
             .rotate(self.velocity.angle())
-            .color(self.color);
+            .color(color);
     }
 }
