@@ -1,6 +1,6 @@
 # Boids 🕊
 
-**boids** is a Flocking simulator written in Rust, using the Nannou framework.
+**boids** is a flocking simulator written in Rust, using the Nannou framework.
 
 ![flock](https://i.imgur.com/pX1fNWi.png)
 
@@ -20,18 +20,33 @@
 ### Prerequisites
 
 You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
+You'll also need Git, which you can find [install instructions here](https://github.com/git-guides/install-git)
 
-### MacOS/Linux/Windows
+### MacOS/Linux
 
 - To download and run the program, execute the following commands.
 
 ```sh
 git clone https://github.com/postfen/boids.git
-cd ./boids
+cd boids
 cargo build --release
 cd target/release
 open .
+./boids
 ```
+
+### Windows
+
+```sh
+git clone https://github.com/postfen/boids.git
+cd boids
+cargo build --release
+cd target/release
+start .
+.\boids
+```
+
+`to be written`
 
 To run again, just find the compiled `boids` executable (default location is
 `boids/target/release`), and run the program by double clicking on it.
