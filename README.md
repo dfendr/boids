@@ -20,6 +20,7 @@
 ### Prerequisites
 
 You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
+You'll also need Git, which you can find [install instructions here](https://github.com/git-guides/install-git)
 
 ### MacOS/Linux
 
@@ -27,13 +28,23 @@ You'll need Rust installed on your system to build, which you can [install here]
 
 ```sh
 git clone https://github.com/postfen/boids.git
-cd ./boids
+cd boids
 cargo build --release
 cd target/release
 open .
+./boids
 ```
 
 ### Windows
+
+```sh
+git clone https://github.com/postfen/boids.git
+cd boids
+cargo build --release
+cd target/release
+start .
+.\boids
+```
 
 `to be written`
 
