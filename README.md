@@ -19,12 +19,14 @@
 
 ### Prerequisites
 
-- You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
-- You'll also need Git, which you can find [install instructions here](https://github.com/git-guides/install-git)
+- **Rust** installed on your system to build the project, which you can [install
+  here](https://www.rust-lang.org/learn/get-started).
+- **Git** to download the repo from the terminal, which you can find [install
+  instructions here](https://github.com/git-guides/install-git)
 
 ### MacOS/Linux
 
-- To download and run the program, execute the following commands.
+- To download and run the program, execute the following commands in your terminal.
 
 ```sh
 git clone https://github.com/postfen/boids.git
@@ -37,6 +39,10 @@ open .
 
 ### Windows
 
+- To download and run the program, execute the following commands in Powershell.
+- *Note - Please let me know if this works. I don't have a Windows
+  machine to test it, currently.*
+
 ```sh
 git clone https://github.com/postfen/boids.git
 cd boids
@@ -45,8 +51,6 @@ cd target/release
 start .
 .\boids
 ```
-
-`to be written`
 
 To run again, just find the compiled `boids` executable (default location is
 `boids/target/release`), and run the program by double clicking on it.
