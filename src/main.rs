@@ -26,6 +26,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     let background_color = match model.theme {
         Theme::Normal => SKYBLUE,
+        Theme::Grey => GREY,
         Theme::DeepSea => BLACK,
     };
     //TODO: Add settings for when theme is changed, like model.theme_pending
