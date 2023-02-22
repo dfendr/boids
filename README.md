@@ -17,6 +17,8 @@
 
 ## Building / Getting Started ⚙️
 
+### Prerequisites
+
 You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
 
 ### MacOS/Linux/Windows
