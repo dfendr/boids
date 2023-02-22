@@ -19,8 +19,8 @@
 
 ### Prerequisites
 
-You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
-You'll also need Git, which you can find [install instructions here](https://github.com/git-guides/install-git)
+- You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
+- You'll also need Git, which you can find [install instructions here](https://github.com/git-guides/install-git)
 
 ### MacOS/Linux
 
