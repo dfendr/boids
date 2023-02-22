@@ -1,6 +1,6 @@
 # Boids 🕊
 
-**boids** is a Flocking simulator written in Rust, using the Nannou framework.
+**boids** is a flocking simulator written in Rust, using the Nannou framework.
 
 ![flock](https://i.imgur.com/pX1fNWi.png)
 
