@@ -21,7 +21,7 @@
 
 You'll need Rust installed on your system to build, which you can [install here](https://www.rust-lang.org/learn/get-started).
 
-### MacOS/Linux/Windows
+### MacOS/Linux
 
 - To download and run the program, execute the following commands.
 
@@ -32,6 +32,10 @@ cargo build --release
 cd target/release
 open .
 ```
+
+### Windows
+
+`to be written`
 
 To run again, just find the compiled `boids` executable (default location is
 `boids/target/release`), and run the program by double clicking on it.
