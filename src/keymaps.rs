@@ -17,6 +17,10 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
         Key::C => {
             model.cursor_mode = model.cursor_mode.next();
         }
+        Key::T => {
+            model.theme= model.theme.next();
+        }
+
         Key::I => {
             model.alignment_modifier += 0.05;
         }
