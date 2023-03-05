@@ -18,7 +18,7 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
             model.cursor_mode = model.cursor_mode.next();
         }
         Key::T => {
-            model.theme= model.theme.next();
+            model.theme = model.theme.next();
         }
 
         Key::I => {
@@ -37,30 +37,31 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
             model.separation_modifier += 0.05;
         }
         Key::Up => {
-            if model.n_boids == 1000 {
+            if model.boid_options.flock_size >= 1000 {
                 return;
             }
-            if model.n_boids < 5 {
-                model.n_boids += 1
+            if model.boid_options.flock_size < 5 {
+                model.boid_options.n_mod += 1
             } else {
-                model.n_boids += 5
+                model.boid_options.n_mod += 5
             };
         }
         Key::Down => {
-            if model.n_boids <= 5 && model.n_boids > 1 {
-                model.n_boids -= 1
+            if model.boid_options.flock_size == 0 {
+                return;
             }
-            if model.n_boids > 6 {
-                model.n_boids -= 5;
-            }
+            if model.boid_options.flock_size > 5 {
+                model.boid_options.n_mod -= 5
+            } else if model.boid_options.flock_size > 1 {
+                model.boid_options.n_mod -= 1
+            };
         }
-        Key::Left => {
-            // TODO: Add predators
-            // model.n_predators += 1;
-        }
+        Key::Left => model.predator_options.n_mod -= 1,
         Key::Right => {
-            // TODO: Add predators
-            // model.n_predators -= 1;
+            if model.predator_options.flock_size > 5 {
+                return;
+            }
+            model.predator_options.n_mod += 1
         }
         Key::H => {
             model.show_text = !model.show_text;

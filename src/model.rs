@@ -1,7 +1,7 @@
 use crate::{
     boids::{
         Boid,
-        BoidType::{Predator, Prey},
+        BoidType::{self, Predator, Prey},
     },
     cursor::CursorMode,
     keymaps::key_pressed,
@@ -12,21 +12,24 @@ use crate::{
 use nannou::prelude::*;
 
 pub struct BoidOptions {
-    pub boid_starting_velocity: f32,
-    pub boid_colour: Rgb8,
-    pub boid_min_speed: f32,
-    pub boid_max_speed: f32,
+    pub boid_type: BoidType,
+    pub starting_velocity: f32,
+    pub colour: Rgb8,
+    pub min_speed: f32,
+    pub max_speed: f32,
+    pub flock_size: u32,
+    pub n_mod: i32,
 }
 
 pub struct Model {
     pub main_window: WindowId,
     pub boid_options: BoidOptions,
+    pub predator_options: BoidOptions,
     pub cursor_mode: CursorMode,
     pub show_text: bool,
     pub theme: Theme,
     pub flock: Vec<Boid>,
     pub predators: Vec<Boid>,
-    pub n_boids: i32,
     pub alignment_modifier: f32,
     pub cohesion_modifier: f32,
     pub separation_modifier: f32,
@@ -34,20 +37,26 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn add_boid(&mut self, bounds: Rect) {
+    pub fn add_boid(&mut self, bounds: Rect, boid_type: BoidType) {
         let (left, right, bottom, top) = bounds.l_r_b_t();
-        let boid = Boid::new(random_range(left, right), random_range(bottom, top), Prey);
-        self.flock.push(boid);
+        let boid = Boid::new(
+            random_range(left, right),
+            random_range(bottom, top),
+            boid_type,
+        );
+
+        match boid_type {
+            Prey => self.flock.push(boid),
+            Predator => self.predators.push(boid),
+        }
     }
-    // pub fn add_predator(&mut self, bounds: Rect) {
-    //     let (left, right, bottom, top) = bounds.l_r_b_t();
-    //     let boid = Boid::new(
-    //         random_range(left, right),
-    //         random_range(bottom, top),
-    //         Predator,
-    //     );
-    //     self.predators.push(boid);
-    // }
+
+    pub fn remove_boid(&mut self, bounds: Rect, boid_type: BoidType) {
+        match boid_type {
+            Prey => self.flock.pop(),
+            Predator => self.predators.pop(),
+        };
+    }
 }
 
 pub fn model(app: &App) -> Model {
@@ -62,31 +71,42 @@ pub fn model(app: &App) -> Model {
     let show_text = true;
     // defaults
     let cursor_mode = CursorMode::Ignore;
-    let n_boids = 100;
     let theme = Theme::Normal;
     let alignment_modifier = 0.25;
     let cohesion_modifier = 0.25;
     let separation_modifier = 0.75;
     let boid_options = BoidOptions {
-        boid_starting_velocity: 1.0,
-        boid_colour: BLACK,
-        boid_min_speed: 1.0,
-        boid_max_speed: 3.0,
+        boid_type: BoidType::Prey,
+        starting_velocity: 1.0,
+        colour: BLACK,
+        min_speed: 1.0,
+        max_speed: 3.0,
+        flock_size: 100,
+        n_mod: 0,
+    };
+    let predator_options = BoidOptions {
+        boid_type: BoidType::Predator,
+        starting_velocity: 1.5,
+        colour: RED,
+        min_speed: 1.0,
+        max_speed: 3.5,
+        flock_size: 1,
+        n_mod: 0,
     };
     let max_force = 0.2;
 
-    let flock = Flock::new_flock(app.window_rect(), n_boids as u32, Prey);
+    let flock = Flock::new_flock(app.window_rect(), boid_options.flock_size as u32, Prey);
     let predators = Flock::new_flock(app.window_rect(), 1, Predator);
 
     Model {
         main_window,
         boid_options,
+        predator_options,
         cursor_mode,
         show_text,
         theme,
         flock,
         predators,
-        n_boids,
         alignment_modifier,
         cohesion_modifier,
         separation_modifier,

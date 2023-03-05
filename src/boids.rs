@@ -91,11 +91,14 @@ impl Boid {
     }
     pub fn separate(&self, nearby_boids: &[&Boid]) -> Vec2 {
         nearby_boids.iter().fold(Vec2::ZERO, |sum, &boid| {
-            let distance_vec = self.position - boid.position;
-            let length = distance_vec.length();
-            let weight = (self.protected_range - length) / self.protected_range;
+            if self.boid_type == boid.boid_type {
+                let distance_vec = self.position - boid.position;
+                let length = distance_vec.length();
+                let weight = (self.protected_range - length) / self.protected_range;
 
-            sum + distance_vec.normalize_or_zero() * weight
+                return sum + distance_vec.normalize_or_zero() * weight;
+            }
+            sum
         })
     }
     pub fn cohere(&self, nearby_boids: &[&Boid]) -> Vec2 {
@@ -165,6 +168,17 @@ impl Boid {
         (nearby_boids, close_boids)
     }
 
+    pub fn close_predators<'a>(&self, predators: &'a Vec<Boid>) -> Vec<&'a Boid> {
+        let mut close_predators: Vec<&Boid> = Vec::new();
+        for other in predators {
+            let d = self.position.distance(other.position).abs();
+            if other != self && d < self.protected_range {
+                close_predators.push(other);
+            }
+        }
+        close_predators
+    }
+
     pub fn avoid_predators(&self, predators: &[Boid]) -> Vec2 {
         let average_position = predators
             .iter()
@@ -196,8 +210,6 @@ impl Boid {
         // Limit speed between bounds
         self.velocity = self.velocity.clamp_length(self.min_speed, self.max_speed);
 
-        //TODO: Implement deltatime when reliable refresh rate can be used.
-        // self.velocity *= delta_time * 120.0;
         self.position += self.velocity;
         // Reset acceleration to 0 each cycle.
         self.acceleration *= 0.0;

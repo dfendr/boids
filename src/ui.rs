@@ -17,7 +17,7 @@ pub fn draw_settings(app: &App, model: &Model, draw: &Draw) {
         draw.text(
             format!(
                 "Boids: {}\nAlignment: {:.1}%\nCohesion: {:.1}%\nSeparation: {:.1}%\nCursor Mode: {:#?}\nFPS {:.0}",
-                model.n_boids,
+                model.boid_options.flock_size,
                 // Added 0.001 so -0.0 wouldn't show up when rounding
                 (model.alignment_modifier + 0.0001) * 100.0,
                 (model.cohesion_modifier + 0.0001) * 100.0,
