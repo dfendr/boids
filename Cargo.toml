@@ -5,8 +5,7 @@ edition = "2021"
 description="Flocking Simulator"
 
 [dependencies]
-nannou = "0.18.1"
-nannou_egui = "0.5.0"
+nannou = "0.19.0"
 
 [profile.release]
 strip = true  # Automatically strip symbols from the binary.
@@ -16,6 +15,6 @@ codegen-units = 1
 
 [package.metadata.bundle]
 name = "boids"
-identifier = "io.github.postfen.boids"
+identifier = "io.github.dfendr.boids"
 osx_minimum_system_version="12.4"
 short_description="Flocking Simulator"

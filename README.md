@@ -2,6 +2,8 @@
 
 **boids** is a flocking simulator written in Rust, using the Nannou framework.
 
+---
+
 ![flock](https://i.imgur.com/pX1fNWi.png)
 
 ## Features 🐤
@@ -40,8 +42,8 @@ open .
 ### Windows
 
 - To download and run the program, execute the following commands in Powershell.
-- *Note - Please let me know if this works. I don't have a Windows
-  machine to test it, currently.*
+- _Note - Please let me know if this works. I don't have a Windows
+  machine to test it, currently._
 
 ```sh
 git clone https://github.com/postfen/boids.git
@@ -57,11 +59,12 @@ To run again, just find the compiled `boids` executable (default location is
 
 ## Controls ⌨️
 
-| Modifier         |   Keys    |
-| ---------------- | :-------: |
-| Alignment        |   `u/i`   |
-| Cohesion         |   `j/k`   |
-| Separation       |   `m/,`   |
-| Add/Remove Boids | `Up/Down` |
-| Change Theme     |    `t`    |
-| Hide Menu        |    `h`    |
+| Modifier             |     Keys     |
+| -------------------- | :----------: |
+| Alignment            |    `u/i`     |
+| Cohesion             |    `j/k`     |
+| Separation           |    `m/,`     |
+| Add/Remove Boids     |  `Up/Down`   |
+| Add/Remove Predators | `Right/Left` |
+| Change Theme         |     `t`      |
+| Hide Menu            |     `h`      |
