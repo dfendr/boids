@@ -4,7 +4,7 @@ use crate::boids::{Boid, BoidType};
 
 pub struct Flock;
 impl Flock {
-    pub fn new_flock(bounds: Rect, n_boids: u32, boid_type: BoidType) -> Vec<Boid> {
+    pub fn new_flock(bounds: Rect, n_boids: usize, boid_type: BoidType) -> Vec<Boid> {
         let (left, right, bottom, top) = bounds.l_r_b_t();
         let mut flock: Vec<Boid> = Vec::new();
         for _ in 0..n_boids {

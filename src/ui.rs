@@ -34,8 +34,8 @@ pub fn draw_settings(app: &App, model: &Model, draw: &Draw) {
     }
 }
 
-pub fn draw_instructions(_app: &App, model: &Model, draw: &Draw) {
-    let position = _app.window_rect().pad_top(50.0).pad_left(100.0).top_left();
+pub fn draw_instructions(app: &App, model: &Model, draw: &Draw) {
+    let position = app.window_rect().pad_top(50.0).pad_left(100.0).top_left();
     if model.show_text {
         draw.text(
             " Up/Down   Add/Remove Boids\nu/i   Alignment\nj/k   Cohesion\nm/,  Separation\nc     Cursor Mode\nh     Hide Text\nq   Quit"

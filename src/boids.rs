@@ -9,27 +9,27 @@ pub enum BoidType {
 }
 
 impl BoidType {
-    fn default_color(&self) -> Rgb8 {
+    fn default_color(self) -> Rgb8 {
         match self {
             BoidType::Prey => BLACK,
             BoidType::Predator => DARKRED,
         }
     }
 
-    fn visual_range(&self) -> f32 {
+    fn visual_range(self) -> f32 {
         match self {
             BoidType::Prey => 80.0,
             BoidType::Predator => 100.0,
         }
     }
 
-    fn max_speed(&self) -> f32 {
+    fn max_speed(self) -> f32 {
         match self {
             BoidType::Prey => 4.0,
             BoidType::Predator => 3.0,
         }
     }
-    fn size(&self) -> (f32, f32) {
+    fn size(self) -> (f32, f32) {
         match self {
             BoidType::Prey => (10.0, 12.0),
             BoidType::Predator => (15.0, 17.0),
@@ -39,7 +39,7 @@ impl BoidType {
 
 #[derive(PartialEq)]
 pub struct Boid {
-    pub boid_type: BoidType,
+    pub b_type: BoidType,
     pub color: Rgb8,
     pub width: f32,
     pub height: f32,
@@ -68,7 +68,7 @@ impl Boid {
         let visual_range = boid_type.visual_range();
         let protected_range = 30.0;
         Boid {
-            boid_type,
+            b_type: boid_type,
             color,
             width,
             height,
@@ -83,15 +83,10 @@ impl Boid {
             protected_range,
         }
     }
-    pub fn align(&self, nearby_boids: &[&Boid]) -> Vec2 {
-        nearby_boids
-            .iter()
-            .fold(Vec2::ZERO, |sum, &boid| sum + boid.velocity)
-            .normalize_or_zero()
-    }
+
     pub fn separate(&self, nearby_boids: &[&Boid]) -> Vec2 {
         nearby_boids.iter().fold(Vec2::ZERO, |sum, &boid| {
-            if self.boid_type == boid.boid_type {
+            if self.b_type == boid.b_type {
                 let distance_vec = self.position - boid.position;
                 let length = distance_vec.length();
                 let weight = (self.protected_range - length) / self.protected_range;
@@ -101,14 +96,18 @@ impl Boid {
             sum
         })
     }
+    #[allow(clippy::cast_precision_loss)]
     pub fn cohere(&self, nearby_boids: &[&Boid]) -> Vec2 {
         let average_position = nearby_boids
             .iter()
             .fold(Vec2::ZERO, |sum, &boid| sum + boid.position);
 
-        match average_position != Vec2::ZERO {
-            true => (average_position / nearby_boids.len() as f32 - self.position).normalize(),
-            false => average_position,
+        if average_position == Vec2::ZERO {
+            average_position
+        } else {
+            // precision loss no big deal when nearby_boids is <=1000
+            let len = nearby_boids.len() as f32;
+            (average_position / len - self.position).normalize()
         }
     }
 
@@ -185,9 +184,10 @@ impl Boid {
             .filter(|predator| predator.position.distance(self.position) < self.visual_range)
             .fold(Vec2::ZERO, |sum, predator| sum + predator.position);
 
-        match average_position == Vec2::ZERO {
-            true => average_position,
-            false => ((average_position - self.position) * -1.0).clamp_length_max(0.7),
+        if average_position == Vec2::ZERO {
+            average_position
+        } else {
+            ((average_position - self.position) * -1.0).clamp_length_max(0.7)
         }
     }
 
@@ -229,4 +229,11 @@ impl Boid {
             .rotate(self.velocity.angle())
             .color(color);
     }
+}
+
+pub fn align(nearby_boids: &[&Boid]) -> Vec2 {
+    nearby_boids
+        .iter()
+        .fold(Vec2::ZERO, |sum, &boid| sum + boid.velocity)
+        .normalize_or_zero()
 }

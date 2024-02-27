@@ -8,7 +8,7 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
     match key {
         Key::S => {
             if let Some(window) = app.window(model.main_window) {
-                window.capture_frame(app.exe_name().expect("Problem saving image") + ".png")
+                window.capture_frame(app.exe_name().expect("Problem saving image") + ".png");
             }
         }
         Key::U => {
@@ -41,9 +41,9 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
                 return;
             }
             if model.boid_options.flock_size < 5 {
-                model.boid_options.n_mod += 1
+                model.boid_options.n_mod += 1;
             } else {
-                model.boid_options.n_mod += 5
+                model.boid_options.n_mod += 5;
             };
         }
         Key::Down => {
@@ -51,9 +51,9 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
                 return;
             }
             if model.boid_options.flock_size > 5 {
-                model.boid_options.n_mod -= 5
+                model.boid_options.n_mod -= 5;
             } else if model.boid_options.flock_size > 1 {
-                model.boid_options.n_mod -= 1
+                model.boid_options.n_mod -= 1;
             };
         }
         Key::Left => model.predator_options.n_mod -= 1,
@@ -61,7 +61,7 @@ pub fn key_pressed(app: &App, model: &mut Model, key: Key) {
             if model.predator_options.flock_size > 5 {
                 return;
             }
-            model.predator_options.n_mod += 1
+            model.predator_options.n_mod += 1;
         }
         Key::H => {
             model.show_text = !model.show_text;

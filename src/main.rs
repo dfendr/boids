@@ -17,7 +17,8 @@ use update::update;
 fn main() {
     nannou::app(model).update(update).run();
 }
-
+// needless_pass_by_value added as Nannou framework expects Frame, not &Frame
+#[allow(clippy::needless_pass_by_value)]
 fn view(app: &App, model: &Model, frame: Frame) {
     let draw = app.draw();
     app.window(model.main_window)
@@ -29,8 +30,6 @@ fn view(app: &App, model: &Model, frame: Frame) {
         Theme::Grey => GREY,
         Theme::DeepSea => BLACK,
     };
-    //TODO: Add settings for when theme is changed, like model.theme_pending
-    // so changes don't have to repeatedly apply. Set and forget.
 
     draw.background().color(background_color);
     draw_information_text(app, model, &draw);

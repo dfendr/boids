@@ -17,7 +17,7 @@ pub struct BoidOptions {
     pub colour: Rgb8,
     pub min_speed: f32,
     pub max_speed: f32,
-    pub flock_size: u32,
+    pub flock_size: usize,
     pub n_mod: i32,
 }
 
@@ -51,7 +51,7 @@ impl Model {
         }
     }
 
-    pub fn remove_boid(&mut self, bounds: Rect, boid_type: BoidType) {
+    pub fn remove_boid(&mut self, boid_type: BoidType) {
         match boid_type {
             Prey => self.flock.pop(),
             Predator => self.predators.pop(),
@@ -95,7 +95,7 @@ pub fn model(app: &App) -> Model {
     };
     let max_force = 0.2;
 
-    let flock = Flock::new_flock(app.window_rect(), boid_options.flock_size as u32, Prey);
+    let flock = Flock::new_flock(app.window_rect(), boid_options.flock_size, Prey);
     let predators = Flock::new_flock(app.window_rect(), 1, Predator);
 
     Model {

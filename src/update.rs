@@ -1,9 +1,6 @@
-use nannou::{
-    prelude::{Signed, Update},
-    App,
-};
+use nannou::{prelude::Update, App};
 // use ui::update_ui;
-use crate::model::Model;
+use crate::{boids::align, model::Model};
 
 pub fn update(app: &App, model: &mut Model, _update: Update) {
     update_model(app, model);
@@ -28,7 +25,7 @@ pub fn update(app: &App, model: &mut Model, _update: Update) {
 
     for i in 0..model.flock.len() {
         let (nearby_boids, close_boids) = model.flock[i].get_neighbours(&model.flock);
-        let alignment = model.flock[i].align(&nearby_boids) * model.alignment_modifier;
+        let alignment = align(&nearby_boids) * model.alignment_modifier;
         let seperation = model.flock[i].separate(&close_boids) * model.separation_modifier;
         let cohesion = model.flock[i].cohere(&nearby_boids) * model.cohesion_modifier;
         let predator_avoidance = model.flock[i].avoid_predators(&model.predators);
@@ -77,25 +74,25 @@ fn adjust_boid_count(app: &App, model: &mut Model) {
         match model.predator_options.n_mod.signum() {
             1 => {
                 for _ in 0..model.predator_options.n_mod {
-                    model.add_boid(bounds, model.predator_options.boid_type)
+                    model.add_boid(bounds, model.predator_options.boid_type);
                 }
             }
-            -1 => model.remove_boid(bounds, model.predator_options.boid_type),
+            -1 => model.remove_boid(model.predator_options.boid_type),
             0 => {}
             _ => panic!("Unreachable match condition"),
         };
     }
     model.predator_options.n_mod = 0;
-    model.predator_options.flock_size = model.predators.len() as u32;
+    model.predator_options.flock_size = model.predators.len();
 
     for _ in 0..model.boid_options.n_mod.abs() {
         match model.boid_options.n_mod.signum() {
             1 => model.add_boid(bounds, model.boid_options.boid_type),
-            -1 => model.remove_boid(bounds, model.boid_options.boid_type),
+            -1 => model.remove_boid(model.boid_options.boid_type),
             0 => {}
             _ => panic!("Unreachable match condition"),
         };
     }
     model.boid_options.n_mod = 0;
-    model.boid_options.flock_size = model.flock.len() as u32;
+    model.boid_options.flock_size = model.flock.len();
 }

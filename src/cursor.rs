@@ -1,4 +1,5 @@
 #[derive(Debug)]
+#[allow(clippy::module_name_repetitions)]
 pub enum CursorMode {
     Attract,
     Avoid,
